@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+
+
+
+{% extends 'base.html' %}
+
+{% block title %}
+    Registrar Profesor
+{% endblock title %}
+
+{#{% block header %}#}
+{#    {% include 'includes/header.html' %}#}
+{#{% endblock header %}#}
+
+
+{% block content %}
     <h1>Registrar Profesor</h1>
     <form method="post">{% csrf_token %}
     {{ form.as_p }}
         <button type="submit">Registrar</button>
     </form>
-</body>
-</html>
+{% endblock content %}
