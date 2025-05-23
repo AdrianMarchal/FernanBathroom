@@ -1,0 +1,9 @@
+<h2>¿Estás seguro de que quieres borrar todos los datos?</h2>
+
+<p>Esta acción eliminará todos los cursos, grupos y alumnos.</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" style="color: red;">Sí, borrar todo</button>
+  <a href="{% url 'importar_csv' %}">Cancelar</a>
+</form>

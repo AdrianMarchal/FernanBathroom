@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Importar Alumnos{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">📥 Importar Alumnos desde CSV</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="mb-4 border rounded p-4 shadow-sm bg-light">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="archivo" class="form-label">Selecciona un archivo CSV:</label>
+            <input type="file" name="archivo" class="form-control" id="archivo" accept=".csv" required>
+        </div>
+        <button type="submit" class="btn btn-success">Importar alumnos</button>
+        <a href="{% url 'borrar_datos' %}" class="btn btn-danger float-end">🗑 Borrar todos los datos</a>
+    </form>
+
+    {% if alumnos_rechazados %}
+        <div class="alert alert-warning">
+            <strong>Los siguientes alumnos no fueron importados porque no tienen asignada una unidad válida:</strong>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead class="table-warning">
+                <tr>
+                    <th>Nombre del Alumno</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos_rechazados %}
+                    <tr>
+                        <td>{{ alumno }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock content %}
