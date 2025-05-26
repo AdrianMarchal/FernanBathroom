@@ -11,6 +11,7 @@ from applications.users.decorators import user_type_required
 from applications.users.forms import UserRegisterForm, LoginForm
 from applications.users.mixins import AnonymousRequiredMixin
 from applications.users.models import User
+from django.contrib import messages
 
 
 # Create your views here.
@@ -19,19 +20,26 @@ from applications.users.models import User
 @method_decorator(login_required, name='dispatch')
 @method_decorator(user_type_required('administrador'), name='dispatch')
 class UserRegisterView(FormView):
-    template_name = "user/admin/registrarProfesor.html"
+    template_name = "user/admin/registrarUsuario.html"
     form_class = UserRegisterForm
-    success_url = '/'
+    success_url = reverse_lazy("users_app:registerUser")
 
     def form_valid(self, form):
+        email = form.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            form.add_error('email', 'Ya existe un usuario con este correo.')
+            return self.form_invalid(form)
+
         User.objects.create_user(
-            email=form.cleaned_data['email'],
+            email=email,
             password=form.cleaned_data['password1'],
-            type_user="profesor",
+            type_user=form.cleaned_data['type_user'],  # profesor o conserje
             nombre=form.cleaned_data['nombre'],
             apellido=form.cleaned_data['apellido'],
         )
-        return super(UserRegisterView, self).form_valid(form)
+        messages.success(self.request, "Usuario registrado exitosamente.")
+        return super().form_valid(form)
+
 
 
 class LoginView(AnonymousRequiredMixin, FormView):

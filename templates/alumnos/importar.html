@@ -44,5 +44,25 @@
             </tbody>
         </table>
     {% endif %}
+
+    {% if alumnos_duplicados %}
+        <div class="alert alert-info mt-4">
+            <strong>Los siguientes alumnos ya existían en la base de datos y no fueron importados nuevamente:</strong>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead class="table-info">
+                <tr>
+                    <th>Nombre del Alumno</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos_duplicados %}
+                    <tr>
+                        <td>{{ alumno }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </div>
 {% endblock content %}

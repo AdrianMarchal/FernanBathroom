@@ -1,9 +1,26 @@
-<h2>¿Estás seguro de que quieres borrar todos los datos?</h2>
+{% extends "base.html" %}
 
-<p>Esta acción eliminará todos los cursos, grupos y alumnos.</p>
+{% block title %}Borrar Todos los Datos{% endblock title %}
 
-<form method="post">
-  {% csrf_token %}
-  <button type="submit" style="color: red;">Sí, borrar todo</button>
-  <a href="{% url 'importar_csv' %}">Cancelar</a>
-</form>
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-danger shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title text-danger">⚠️ ¿Estás seguro de que quieres borrar todos los datos?</h2>
+            <p class="card-text">
+                Esta acción <strong>eliminará todos los cursos, grupos y alumnos</strong>. Esta operación no se puede deshacer.
+            </p>
+
+            <form method="post" class="mt-4 d-flex gap-3 align-items-center">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    🗑 Sí, borrar todo
+                </button>
+                <a href="{% url 'importar_csv' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

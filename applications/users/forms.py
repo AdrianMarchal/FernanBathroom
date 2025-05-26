@@ -2,8 +2,15 @@ from django import forms
 from django.contrib.auth import authenticate
 
 from .models import User
+from django import forms
+from django.contrib.auth import get_user_model
+
 
 class UserRegisterForm(forms.ModelForm):
+    TIPO_USUARIO_CHOICES = [
+        ('profesor', 'Profesor'),
+        ('conserje', 'Conserje'),
+    ]
 
     password1 = forms.CharField(
         label='Contraseña',
@@ -11,31 +18,45 @@ class UserRegisterForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={
                 'placeholder': 'Contraseña',
+                'class': 'form-control',
             }
         )
     )
 
     password2 = forms.CharField(
-        label='Contraseña',
+        label='Repetir Contraseña',
         required=True,
         widget=forms.PasswordInput(
             attrs={
                 'placeholder': 'Repetir Contraseña',
+                'class': 'form-control',
             }
         )
     )
 
+    type_user = forms.ChoiceField(
+        label='Tipo de Usuario',
+        choices=TIPO_USUARIO_CHOICES,
+        initial='profesor',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
     class Meta:
         model = User
-        fields = (
-            'email',
-            'nombre',
-            'apellido',
-        )
+        fields = ('email', 'nombre', 'apellido')
+        widgets = {
+            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control'}),
+            'nombre': forms.TextInput(attrs={'placeholder': 'Nombre', 'class': 'form-control'}),
+            'apellido': forms.TextInput(attrs={'placeholder': 'Apellido', 'class': 'form-control'}),
+        }
 
     def clean_password2(self):
-        if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
             self.add_error('password2', 'Las contraseñas no coinciden')
+        return password2
+
 
 
 

@@ -13,10 +13,28 @@ from .models import Grupo, Alumno, Curso
 import csv
 import io
 
-def importar_csv(request):
-    alumnos_rechazados = []
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Grupo, Alumno, Curso
+import csv
+import io
 
-    if request.method == 'POST':
+from ..users.decorators import user_type_required
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_type_required('administrador'), name='dispatch')
+class ImportarCSVView(View):
+    def get(self, request):
+        return render(request, 'alumnos/importar.html')
+
+    def post(self, request):
+        alumnos_rechazados = []
+        alumnos_duplicados = []
+
         archivo = request.FILES.get('archivo')
         if not archivo.name.endswith('.csv'):
             messages.error(request, 'El archivo debe ser un CSV.')
@@ -52,20 +70,30 @@ def importar_csv(request):
 
             curso, _ = Curso.objects.get_or_create(nivel=curso_str)
             grupo, _ = Grupo.objects.get_or_create(curso=curso, letra=letra)
-            _, creado = Alumno.objects.get_or_create(nombre=nombre, grupo=grupo)
+
+            if Alumno.objects.filter(nombre=nombre, grupo=grupo).exists():
+                alumnos_duplicados.append(nombre)
+                continue
+
+            Alumno.objects.create(nombre=nombre, grupo=grupo)
 
         messages.success(request, 'Alumnos importados correctamente.')
+        return render(request, 'alumnos/importar.html', {
+            'alumnos_rechazados': alumnos_rechazados,
+            'alumnos_duplicados': alumnos_duplicados
+        })
 
-    return render(request, 'alumnos/importar.html', {'alumnos_rechazados': alumnos_rechazados})
 
 
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_type_required('administrador'), name='dispatch')
+class BorrarDatosView(View):
+    def get(self, request):
+        return render(request, 'alumnos/borrar_confirmacion.html')
 
-def borrar_datos(request):
-    if request.method == 'POST':
+    def post(self, request):
         Alumno.objects.all().delete()
         Grupo.objects.all().delete()
         Curso.objects.all().delete()
         messages.success(request, 'Todos los datos han sido eliminados correctamente.')
-        return redirect('importar_csv')  # O redirige a donde prefieras
-
-    return render(request, 'alumnos/borrar_confirmacion.html')
+        return redirect('importar_csv')
