@@ -100,7 +100,8 @@ class BorrarDatosView(View):
         messages.success(request, 'Todos los datos han sido eliminados correctamente.')
         return redirect('importar_csv')
 
-
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_type_required('administrador', 'profesor', 'conserje'), name='dispatch')
 class ListarAlumnos(ListView):
     # Se puede sobrescribir el template name asi
     # path('usuarios/', ListarUsuarios.as_view(template_name='usuarios/lista_general.html'), name='usuarios_lista_general'),

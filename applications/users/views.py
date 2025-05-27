@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from django.urls import reverse, reverse_lazy
 
 from applications.users.decorators import user_type_required
@@ -20,7 +20,7 @@ from django.contrib import messages
 @method_decorator(login_required, name='dispatch')
 @method_decorator(user_type_required('administrador'), name='dispatch')
 class UserRegisterView(FormView):
-    template_name = "user/admin/registrarUsuario.html"
+    template_name = "user/admin/registrar_usuario.html"
     form_class = UserRegisterForm
     success_url = reverse_lazy("users_app:registerUser")
 
@@ -76,3 +76,14 @@ class LogoutView(View):
 
 def permission_denied_redirect(request):
     return render(request, "errors/permission_denied.html")
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_type_required('administrador'), name='dispatch')
+class UserListView(ListView):
+    model = User
+    template_name = "user/admin/listar_usuario.html"
+    context_object_name = 'users'
+
+    def get_queryset(self):
+        return User.objects.exclude(type_user_per='SuperUsuarioRoot')

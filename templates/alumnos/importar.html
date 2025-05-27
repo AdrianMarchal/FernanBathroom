@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Importar Alumnos{% endblock title %}
-
+{% block header %}
+    {% include 'includes/headers/header_admin.html' %}
+{% endblock header %}
 {% block content %}
 <div class="container">
     <h2 class="mb-4">📥 Importar Alumnos desde CSV</h2>

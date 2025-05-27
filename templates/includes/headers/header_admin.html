@@ -1,0 +1,19 @@
+{% extends "includes/headers/header_base.html" %}
+
+{% block nav_links %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'home_app:homeAdmin' %}">Inicio</a>  <!-- Este será el "Inicio" -->
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'listar_alumnos' %}">Alumnos</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'importar_csv' %}">Importar Alumnos</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users_app:listar_usuarios' %}">Listar Usuarios</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users_app:registerUser' %}">Registrar Usuarios</a>
+    </li>
+{% endblock nav_links %}

@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">MiSistema</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContenido">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% block nav_links %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ home_url|default:'#' }}">Inicio</a>
+                </li>
+                {% endblock nav_links %}
+            </ul>
+
+            <ul class="navbar-nav">
+                <!-- Dropdown con icono -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-5"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li class="dropdown-item-text"><strong>Usuario:</strong> {{ user.get_full_name  }}</li>
+                        <li class="dropdown-item-text"><strong>Tipo:</strong> {{ user.type_user_per|capfirst }}</li>
+                        <li class="dropdown-item-text"><strong>Email:</strong> {{ user.email }}</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'users_app:userLogout' %}">Cerrar sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

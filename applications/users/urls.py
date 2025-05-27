@@ -9,6 +9,10 @@ urlpatterns = [
         'registerUser/',
         views.UserRegisterView.as_view(),
         name='registerUser'),
+    path(
+        'listar_usuarios/',
+        views.UserListView.as_view(),
+        name='listar_usuarios'),
 
     path(
         'login/',
