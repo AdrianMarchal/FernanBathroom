@@ -7,6 +7,8 @@ import csv
 import io
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.views.generic import ListView
+
 from .models import Grupo, Alumno, Curso
 
 
@@ -97,3 +99,17 @@ class BorrarDatosView(View):
         Curso.objects.all().delete()
         messages.success(request, 'Todos los datos han sido eliminados correctamente.')
         return redirect('importar_csv')
+
+
+class ListarAlumnos(ListView):
+    # Se puede sobrescribir el template name asi
+    # path('usuarios/', ListarUsuarios.as_view(template_name='usuarios/lista_general.html'), name='usuarios_lista_general'),
+    model = Alumno
+    template_name = "alumnos/listar_alumnos.html"
+    context_object_name = 'alumnos'
+    paginate_by = 25
+
+    def get_queryset(self):
+        return Alumno.objects.select_related('grupo__curso').order_by(
+            'grupo__curso__nivel', 'grupo__letra', 'nombre'
+        )

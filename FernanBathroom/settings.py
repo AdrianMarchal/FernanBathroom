@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'applications.users',
-    'applications.alumnos'
+    'applications.alumnos',
+    'applications.historial',
 ]
 
 MIDDLEWARE = [
