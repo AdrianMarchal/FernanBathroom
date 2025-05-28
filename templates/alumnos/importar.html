@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 
 {% block title %}Importar Alumnos{% endblock title %}
+
 {% block header %}
     {% include 'includes/headers/header_admin.html' %}
 {% endblock header %}
+
 {% block content %}
 <div class="container">
     <h2 class="mb-4">📥 Importar Alumnos desde CSV</h2>
+
+    <!-- Spinner de carga (oculto por defecto) -->
+    <div id="spinner-container" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Procesando...</span>
+        </div>
+        <p class="mt-2">Procesando archivo CSV. Por favor, espera...</p>
+    </div>
 
     {% if messages %}
         {% for message in messages %}
@@ -47,6 +57,26 @@
         </table>
     {% endif %}
 
+    {% if alumnos_cambiados %}
+        <div class="alert alert-primary mt-4">
+            <strong>Los siguientes alumnos ya existían pero han sido actualizados con un nuevo grupo:</strong>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nombre del Alumno</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos_cambiados %}
+                    <tr>
+                        <td>{{ alumno }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
     {% if alumnos_duplicados %}
         <div class="alert alert-info mt-4">
             <strong>Los siguientes alumnos ya existían en la base de datos y no fueron importados nuevamente:</strong>
@@ -68,3 +98,12 @@
     {% endif %}
 </div>
 {% endblock content %}
+
+{% block scripts %}
+<script>
+    // Al enviar el formulario, mostramos el spinner de carga
+    document.querySelector('form').addEventListener('submit', function () {
+        document.getElementById('spinner-container').style.display = 'block';
+    });
+</script>
+{% endblock scripts %}
