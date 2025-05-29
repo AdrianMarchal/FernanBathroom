@@ -23,4 +23,5 @@ urlpatterns = [
         path('', include('applications.users.urls')),
         path('', include('applications.home.urls')),
         path('', include('applications.alumnos.urls')),
+        path('', include('applications.historial.urls'))
 ]

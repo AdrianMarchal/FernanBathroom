@@ -3,7 +3,7 @@ import unicodedata
 import csv
 import io
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, time
 from django.db.models import Count, Func
 from django.views import View
 from django.utils.decorators import method_decorator
@@ -105,19 +105,20 @@ class Unaccent(Func):
     function = 'unaccent'
 
 
+from django.utils import timezone
+from django.db.models import Count, Q
+from datetime import timedelta
+from django.views.generic import ListView
+from applications.alumnos.models import Alumno, Curso, Grupo
+from applications.historial.models import HistorialBathroom
+
 @method_decorator(login_required, name='dispatch')
-@method_decorator(user_type_required('administrador', 'profesor'), name='dispatch')
+@method_decorator(user_type_required('administrador', 'profesor', 'conserje'), name='dispatch')
 class ListarAlumnos(ListView):
     model = Alumno
     template_name = "alumnos/listar_alumnos.html"
     context_object_name = 'alumnos'
     paginate_by = 25
-
-    def quitar_tildes(self, texto):
-        return ''.join(
-            c for c in unicodedata.normalize('NFD', texto)
-            if unicodedata.category(c) != 'Mn'
-        )
 
     def get_queryset(self):
         queryset = Alumno.objects.select_related('grupo__curso').order_by(
@@ -129,7 +130,7 @@ class ListarAlumnos(ListView):
         grupo_id = self.request.GET.get('grupo')
 
         if nombre:
-            palabras = self.quitar_tildes(nombre).strip().split()
+            palabras = nombre.strip().split()
             queryset = queryset.annotate(nombre_unaccent=Unaccent('nombre'))
             for palabra in palabras:
                 queryset = queryset.filter(nombre_unaccent__icontains=palabra)
@@ -143,37 +144,34 @@ class ListarAlumnos(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context['cursos'] = Curso.objects.all().order_by('nivel')
         context['grupos'] = Grupo.objects.select_related('curso').order_by('curso__nivel', 'letra')
 
         hoy = timezone.localtime().date()
-        inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
 
-        estadisticas = {}
-        for alumno in context['alumnos']:
-            tramo1 = HistorialBathroom.objects.filter(
-                alumno=alumno,
-                hora__gte=timezone.datetime.combine(hoy, timezone.datetime.strptime('08:00', '%H:%M').time()).time(),
-                hora__lte=timezone.datetime.combine(hoy, timezone.datetime.strptime('11:00', '%H:%M').time()).time()
-            ).count()
+        alumno_ids = [a.id for a in context['alumnos']]
 
-            tramo2 = HistorialBathroom.objects.filter(
-                alumno=alumno,
-                hora__gt=timezone.datetime.combine(hoy, timezone.datetime.strptime('11:00', '%H:%M').time()).time(),
-                hora__lte=timezone.datetime.combine(hoy, timezone.datetime.strptime('15:00', '%H:%M').time()).time()
-            ).count()
+        # Obtener los conteos agrupados para todos los alumnos paginados en una consulta
+        registros = HistorialBathroom.objects.filter(
+            alumno_id__in=alumno_ids,
+            fecha__range=(inicio_semana, hoy),
+        ).exclude(tramo=0).values('alumno_id').annotate(
+            tramo1_count=Count('id', filter=Q(tramo=1, fecha=hoy)),
+            tramo2_count=Count('id', filter=Q(tramo=2, fecha=hoy)),
+            semana_count=Count('id'),
+        )
 
-            semana = HistorialBathroom.objects.filter(
-                alumno=alumno,
-                hora__isnull=False,
-                fecha__range=(inicio_semana, hoy)
-            ).count()
-
-            estadisticas[alumno.id] = {
-                'tramo1': tramo1,
-                'tramo2': tramo2,
-                'semana': semana,
-            }
+        estadisticas = {r['alumno_id']: {
+            'tramo1': r['tramo1_count'],
+            'tramo2': r['tramo2_count'],
+            'semana': r['semana_count'],
+        } for r in registros}
 
         context['estadisticas'] = estadisticas
+
         return context
+
+
+
