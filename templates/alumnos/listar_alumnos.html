@@ -8,6 +8,8 @@
         {% include 'includes/headers/header_admin.html' %}
     {% elif request.user.type_user_per == 'profesor' %}
         {% include 'includes/headers/header_profesor.html' %}
+    {% elif request.user.type_user_per == 'conserje' %}
+        {% include 'includes/headers/header_conserje.html' %}
     {% endif %}
 {% endblock header %}
 

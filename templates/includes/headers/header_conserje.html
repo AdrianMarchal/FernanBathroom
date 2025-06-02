@@ -1,0 +1,10 @@
+{% extends "includes/headers/header_base.html" %}
+
+{% block nav_links %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'home_app:homeConserje' %}">Inicio</a>  <!-- Este será el "Inicio" -->
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'listar_alumnos' %}">Alumnos</a>
+    </li>
+{% endblock nav_links %}
