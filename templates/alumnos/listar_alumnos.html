@@ -14,46 +14,167 @@
 {% endblock header %}
 
 {% block content %}
+    <style>
+        /* Contenedor general */
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        /* Título principal */
+        h2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Glass-card para tabla y formularios */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Tabla personalizada */
+        .table-custom {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .table-custom thead {
+            background-color: #4a90e2;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .table-custom td,
+        .table-custom th {
+            vertical-align: middle;
+            color: #333333;
+        }
+
+        /* Formularios */
+        form.row.g-3 > div > input,
+        form.row.g-3 > div > select {
+            border-radius: 0.75rem;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.15);
+            border: 1px solid #4a90e2;
+        }
+
+        form.row.g-3 > div > input:focus,
+        form.row.g-3 > div > select:focus {
+            border-color: #357ABD;
+            box-shadow: 0 0 12px rgba(53, 122, 189, 0.5);
+            outline: none;
+        }
+
+        /* Botones */
+        .btn-primary {
+            background: #4a90e2;
+            border: none;
+            font-weight: 600;
+            border-radius: 1.5rem;
+            padding: 0.5rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #357ABD;
+        }
+
+        .btn-secondary {
+            border-radius: 1.5rem;
+            padding: 0.5rem 1.5rem;
+        }
+
+        /* Paginación */
+        .pagination .page-link {
+            color: #00703C;
+            font-weight: 500;
+            border-radius: 0.75rem;
+            margin: 0 3px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #4a90e2;
+            border-color: #4a90e2;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.6);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #cccccc;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
     <div class="container">
-        <h2 class="mb-4">📋 Lista de Alumnos</h2>
+        <h2>Lista de Alumnos</h2>
 
-        <!-- Formulario de filtros -->
-        <form method="get" class="row g-3 mb-4">
-            <div class="col-md-4">
-                <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre"
-                       value="{{ request.GET.nombre }}">
-            </div>
-            <div class="col-md-4">
-                <select name="curso" class="form-select">
-                    <option value="">Todos los cursos</option>
-                    {% for curso in cursos %}
-                        <option value="{{ curso.id }}"
-                                {% if request.GET.curso == curso.id|stringformat:"s" %}selected{% endif %}>
-                            {{ curso.nivel }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select name="grupo" class="form-select">
-                    <option value="">Todos los grupos</option>
-                    {% for grupo in grupos %}
-                        <option value="{{ grupo.id }}"
-                                {% if request.GET.grupo == grupo.id|stringformat:"s" %}selected{% endif %}>
-                            {{ grupo }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Buscar</button>
-                <a href="{% url 'listar_alumnos' %}" class="btn btn-secondary">Limpiar</a>
-            </div>
-        </form>
+        <div class="glass-card fade-in">
+            <!-- Formulario filtros -->
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre"
+                           value="{{ request.GET.nombre }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="curso" class="form-select">
+                        <option value="">Todos los cursos</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}"
+                                    {% if request.GET.curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                                {{ curso.nivel }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="grupo" class="form-select">
+                        <option value="">Todos los grupos</option>
+                        {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}"
+                                    {% if request.GET.grupo == grupo.id|stringformat:"s" %}selected{% endif %}>
+                                {{ grupo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 d-flex gap-3">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                    <a href="{% url 'listar_alumnos' %}" class="btn btn-secondary">Limpiar</a>
+                </div>
+            </form>
 
-        {% if alumnos %}
-            <table class="table table-bordered table-hover shadow-sm">
-                <thead class="table-primary">
+            {% if alumnos %}
+                <table class="table table-hover table-custom mb-0">
+                    <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Curso</th>
@@ -65,8 +186,8 @@
                             <th>Acciones</th>
                         {% endif %}
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for alumno in alumnos %}
                         {% with est=estadisticas|get_item:alumno.id %}
                             <tr>
@@ -80,58 +201,61 @@
                                     <td>
                                         <form method="post" action="{% url 'crear_historial' alumno.id %}">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-success">➕ Añadir</button>
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                ➕ Añadir
+                                            </button>
                                         </form>
                                     </td>
                                 {% endif %}
                             </tr>
                         {% endwith %}
                     {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
 
-            {% if is_paginated %}
-                <nav aria-label="Paginación" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
-                                    Anterior
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-                        {% endif %}
-
-                        {% for num in paginator.page_range %}
-                            {% if num == page_obj.number %}
-                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                            {% else %}
+                {% if is_paginated %}
+                    <nav aria-label="Paginación" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
                                 <li class="page-item">
                                     <a class="page-link"
-                                       href="?page={{ num }}&{{ request.GET.urlencode|safe|cut:'page=' }}">{{ num }}</a>
+                                       href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
+                                        Anterior
+                                    </a>
                                 </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
                             {% endif %}
-                        {% endfor %}
 
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
-                                    Siguiente
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-                        {% endif %}
-                    </ul>
-                </nav>
+                            {% for num in paginator.page_range %}
+                                {% if num == page_obj.number %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?page={{ num }}&{{ request.GET.urlencode|safe|cut:'page=' }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
+                                        Siguiente
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    No hay alumnos registrados aún.
+                </div>
             {% endif %}
-        {% else %}
-            <div class="alert alert-info">
-                No hay alumnos registrados aún.
-            </div>
-        {% endif %}
+        </div>
     </div>
 {% endblock content %}

@@ -1,31 +1,43 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">MiSistema</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
+{% load static %}
+<nav class="navbar navbar-expand-lg" style="background-color: #00703C;">
+    <div class="container-fluid px-4">
+        <img src="{% static 'Logo-FernanBathRoom.png' %}" alt="logo"
+             style="width: 44px; height: 44px; margin-right: 8px; border-radius: 50%;">
+        <a class="navbar-brand fw-bold text-white">FernanBathroom</a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContenido">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContenido">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% block nav_links %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ home_url|default:'#' }}">Inicio</a>
-                </li>
+                    <li class="nav-item">
+                        {# Comparamos request.path con el home_url para marcar active #}
+                        <a class="nav-link text-white fw-bold fs-5 {% if request.path == home_url %}active{% endif %}"
+                           href="{{ home_url|default:'#' }}">
+                           Inicio
+                        </a>
+                    </li>
                 {% endblock nav_links %}
             </ul>
 
+            <!-- Dropdown de usuario -->
             <ul class="navbar-nav">
-                <!-- Dropdown con icono -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle fs-5"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li class="dropdown-item-text"><strong>Usuario:</strong> {{ user.get_full_name  }}</li>
-                        <li class="dropdown-item-text"><strong>Tipo:</strong> {{ user.type_user_per|capfirst }}</li>
-                        <li class="dropdown-item-text"><strong>Email:</strong> {{ user.email }}</li>
-                        <li><hr class="dropdown-divider"></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-3" aria-labelledby="navbarDropdown">
+                        <li class="dropdown-item-text small text-muted">
+                            <strong>Usuario:</strong> {{ user.get_full_name }}</li>
+                        <li class="dropdown-item-text small text-muted">
+                            <strong>Tipo:</strong> {{ user.type_user_per|capfirst }}</li>
+                        <li class="dropdown-item-text small text-muted"><strong>Email:</strong> {{ user.email }}</li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li><a class="dropdown-item text-danger" href="{% url 'users_app:userLogout' %}">Cerrar sesión</a></li>
                     </ul>
                 </li>
@@ -33,3 +45,9 @@
         </div>
     </div>
 </nav>
+
+<style>
+  .navbar-nav .nav-link:hover {
+    color: #A5D6A7 !important;
+  }
+</style>

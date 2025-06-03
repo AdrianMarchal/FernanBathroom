@@ -1,37 +1,126 @@
 {% extends "base.html" %}
 
 {% block title %}Lista de Usuarios{% endblock title %}
+
 {% block header %}
     {% include 'includes/headers/header_admin.html' %}
 {% endblock header %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">📋 Lista de Usuarios</h2>
+<!-- === Estilos específicos para esta página (coherentes con el “glassmorphism” y la tipografía que ya usas) === -->
+<style>
+  /* =======================
+     Glassmorphism para contenedores
+     ======================= */
+  .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* =======================
+     Título de subpágina
+     ======================= */
+  .subpage-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* =======================
+     Tabla personalizada
+     ======================= */
+  .table-custom {
+      border-radius: 0.75rem;
+      overflow: hidden; /* para que el borde redondeado se aplique correctamente */
+      margin-bottom: 0; /* evitamos doble margen con el wrapper */
+  }
+  .table-custom thead {
+      background-color: #4a90e2;
+      color: #ffffff;
+      font-weight: 600;
+  }
+  .table-custom tbody tr:hover {
+      background-color: rgba(74, 144, 226, 0.1);
+  }
+  .table-custom td,
+  .table-custom th {
+      vertical-align: middle;
+      color: #333333;
+  }
+
+  /* =======================
+     Estilos de paginación
+     ======================= */
+  .pagination .page-link {
+      color: #00703C;
+      font-weight: 500;
+  }
+  .pagination .page-item.active .page-link {
+      background-color: #4a90e2;
+      border-color: #4a90e2;
+      color: #ffffff;
+      font-weight: 600;
+  }
+  .pagination .page-item.disabled .page-link {
+      color: #cccccc;
+  }
+
+  /* =======================
+     Alertas (coherentes con tu tema)
+     ======================= */
+  .alert-info {
+      background-color: rgba(74, 144, 226, 0.1);
+      color: #2c3e50;
+      border: none;
+  }
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="container py-4">
+    <h2 class="subpage-title">Lista de Usuarios</h2>
 
     {% if users %}
-        <table class="table table-bordered table-hover shadow-sm">
-            <thead class="table-primary">
-                <tr>
-                    <th>Email</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Tipo de Usuario</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
+        <!-- =========================================
+             Glass-card contenedor para la tabla
+             ========================================= -->
+        <div class="glass-card p-4 mb-4 fade-in">
+            <table class="table table-hover table-custom mb-0">
+                <thead>
                     <tr>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.nombre }}</td>
-                        <td>{{ user.apellido }}</td>
-                        <td>{{ user.type_user_per }}</td>
+                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Tipo de Usuario</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.nombre }}</td>
+                            <td>{{ user.apellido }}</td>
+                            <td>{{ user.type_user_per }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         {% if is_paginated %}
+            <!-- =======================
+                 Paginación centrada
+                 ======================= -->
             <nav aria-label="Paginación" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
@@ -39,7 +128,9 @@
                             <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
                     {% endif %}
 
                     {% for num in paginator.page_range %}
@@ -53,12 +144,13 @@
                             <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                        <li class="page-item disabled">
+                            <span class="page-link">Siguiente</span>
+                        </li>
                     {% endif %}
                 </ul>
             </nav>
         {% endif %}
-
     {% else %}
         <div class="alert alert-info">
             No hay usuarios registrados aún.

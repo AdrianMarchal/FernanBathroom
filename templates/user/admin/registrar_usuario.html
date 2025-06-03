@@ -2,16 +2,65 @@
 {% load widget_tweaks %}
 
 {% block title %}Registrar Usuario{% endblock title %}
+
 {% block header %}
     {% include 'includes/headers/header_admin.html' %}
 {% endblock header %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="col-md-6">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
-                <h2 class="card-title text-center mb-4">👤 Registrar Nuevo Usuario</h2>
+<style>
+    body {
+        
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        border-radius: 2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .glass-card .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .glass-card .btn-primary {
+        background: #4a90e2;
+        border: none;
+    }
+
+    .glass-card .btn-primary:hover {
+        background: #357ABD;
+    }
+
+    .form-control:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+    }
+
+    .card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100 fade-in">
+    <div class="col-lg-6 col-md-8">
+        <div class="card glass-card p-4">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Registrar Nuevo Usuario</h2>
 
                 {% if messages %}
                     {% for message in messages %}
@@ -36,12 +85,12 @@
                         </div>
                     {% endfor %}
 
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                            ✅ Registrar Usuario
+                    <div class="d-grid gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                             Registrar Usuario
                         </button>
-                        <a href="{% url 'importar_csv' %}" class="btn btn-secondary rounded-pill">
-                            Cancelar
+                        <a href="{% url 'home_app:homeAdmin' %}" class="btn btn-outline-secondary rounded-pill">
+                             Cancelar
                         </a>
                     </div>
                 </form>

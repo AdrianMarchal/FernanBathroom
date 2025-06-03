@@ -2,18 +2,18 @@
 
 {% block nav_links %}
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'home_app:homeAdmin' %}">Inicio</a>  <!-- Este será el "Inicio" -->
+        <a class="nav-link text-white fw-bold fs-10"  href="{% url 'home_app:homeAdmin' %}">Inicio</a>  <!-- Este será el "Inicio" -->
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'listar_alumnos' %}">Alumnos</a>
+        <a class="nav-link text-white fw-bold fs-10"  href="{% url 'listar_alumnos' %}">Alumnos</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'importar_csv' %}">Importar Alumnos</a>
+        <a class="nav-link text-white fw-bold fs-10"  href="{% url 'importar_csv' %}">Importar Alumnos</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'users_app:listar_usuarios' %}">Listar Usuarios</a>
+        <a class="nav-link text-white fw-bold fs-10"  href="{% url 'users_app:listar_usuarios' %}">Listar Usuarios</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'users_app:registerUser' %}">Registrar Usuarios</a>
+        <a class="nav-link text-white fw-bold fs-10"  href="{% url 'users_app:registerUser' %}">Registrar Usuarios</a>
     </li>
 {% endblock nav_links %}

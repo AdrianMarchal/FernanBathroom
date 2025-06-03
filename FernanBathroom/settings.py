@@ -100,6 +100,9 @@ USE_I18N = True
 
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'FernanBathroom' / 'static',
+]
 
 LOGIN_URL = '/login/'
 

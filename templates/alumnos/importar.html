@@ -7,103 +7,202 @@
 {% endblock header %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">📥 Importar Alumnos desde CSV</h2>
+    <style>
+        /* Contenedor general */
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
 
-    <!-- Spinner de carga (oculto por defecto) -->
-    <div id="spinner-container" class="text-center my-4" style="display: none;">
-        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Procesando...</span>
-        </div>
-        <p class="mt-2">Procesando archivo CSV. Por favor, espera...</p>
-    </div>
+        /* Título principal */
+        h2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        /* Glass-card para tabla y formularios */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Tabla personalizada */
+        .table-custom {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .table-custom thead {
+            background-color: #4a90e2;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .table-custom td,
+        .table-custom th {
+            vertical-align: middle;
+            color: #333333;
+        }
+
+        /* Formularios */
+        form > div > input[type="file"] {
+            border-radius: 0.75rem;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.15);
+            border: 1px solid #4a90e2;
+            padding: 0.375rem 0.75rem;
+        }
+
+        form > div > input[type="file"]:focus {
+            border-color: #357ABD;
+            box-shadow: 0 0 12px rgba(53, 122, 189, 0.5);
+            outline: none;
+        }
+
+        /* Botones */
+        .btn-primary {
+            background: #4a90e2;
+            border: none;
+            font-weight: 600;
+            border-radius: 1.5rem;
+            padding: 0.5rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #357ABD;
+        }
+
+        .btn-danger {
+            border-radius: 1.5rem;
+            padding: 0.5rem 1.5rem;
+        }
+
+        /* Spinner container */
+        #spinner-container {
+            margin-bottom: 2rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <div class="container">
+        <h2>Importar Alumnos desde CSV</h2>
+
+        <!-- Spinner de carga (oculto por defecto) -->
+        <div id="spinner-container" class="text-center my-4" style="display: none;">
+            <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Procesando...</span>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="post" enctype="multipart/form-data" class="mb-4 border rounded p-4 shadow-sm bg-light">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="archivo" class="form-label">Selecciona un archivo CSV:</label>
-            <input type="file" name="archivo" class="form-control" id="archivo" accept=".csv" required>
+            <p class="mt-2 fw-semibold">Procesando archivo CSV. Por favor, espera...</p>
         </div>
-        <button type="submit" class="btn btn-success">Importar alumnos</button>
-        <a href="{% url 'borrar_datos' %}" class="btn btn-danger float-end">🗑 Borrar todos los datos</a>
-    </form>
 
-    {% if alumnos_rechazados %}
-        <div class="alert alert-warning">
-            <strong>Los siguientes alumnos no fueron importados porque no tienen asignada una unidad válida:</strong>
-        </div>
-        <table class="table table-bordered table-hover">
-            <thead class="table-warning">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="glass-card fade-in">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="archivo" class="form-label fw-semibold">Selecciona un archivo CSV</label>
+                <input type="file" name="archivo" class="form-control" id="archivo" accept=".csv" required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary fw-semibold">Importar alumnos</button>
+                <a href="{% url 'borrar_datos' %}" class="btn btn-danger fw-semibold">🗑 Borrar todos los datos</a>
+            </div>
+        </form>
+
+        {% if alumnos_rechazados %}
+            <h5 class="fw-semibold text-warning mt-5 mb-3">Alumnos no importados (unidad inválida):</h5>
+            <table class="table table-hover table-custom mb-0">
+                <thead>
                 <tr>
                     <th>Nombre del Alumno</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 {% for alumno in alumnos_rechazados %}
                     <tr>
                         <td>{{ alumno }}</td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+                </tbody>
+            </table>
+        {% endif %}
 
-    {% if alumnos_cambiados %}
-        <div class="alert alert-primary mt-4">
-            <strong>Los siguientes alumnos ya existían pero han sido actualizados con un nuevo grupo:</strong>
-        </div>
-        <table class="table table-bordered table-hover">
-            <thead class="table-primary">
+        {% if alumnos_cambiados %}
+            <h5 class="fw-semibold text-primary mt-5 mb-3">Alumnos actualizados con nuevo grupo:</h5>
+            <table class="table table-hover table-custom mb-0">
+                <thead>
                 <tr>
                     <th>Nombre del Alumno</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 {% for alumno in alumnos_cambiados %}
                     <tr>
                         <td>{{ alumno }}</td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+                </tbody>
+            </table>
+        {% endif %}
 
-    {% if alumnos_duplicados %}
-        <div class="alert alert-info mt-4">
-            <strong>Los siguientes alumnos ya existían en la base de datos y no fueron importados nuevamente:</strong>
-        </div>
-        <table class="table table-bordered table-hover">
-            <thead class="table-info">
+        {% if alumnos_duplicados %}
+            <h5 class="fw-semibold text-info mt-5 mb-3">Alumnos duplicados (no importados):</h5>
+            <table class="table table-hover table-custom mb-0">
+                <thead>
                 <tr>
                     <th>Nombre del Alumno</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 {% for alumno in alumnos_duplicados %}
                     <tr>
                         <td>{{ alumno }}</td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</div>
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
 {% endblock content %}
 
 {% block scripts %}
-<script>
-    // Al enviar el formulario, mostramos el spinner de carga
-    document.querySelector('form').addEventListener('submit', function () {
-        document.getElementById('spinner-container').style.display = 'block';
-    });
-</script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            document.getElementById('spinner-container').style.display = 'block';
+        });
+    </script>
 {% endblock scripts %}

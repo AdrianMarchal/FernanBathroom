@@ -1,10 +1,9 @@
 from django.shortcuts import render
-import unicodedata
 import csv
 import io
 from django.utils import timezone
-from datetime import timedelta, time
-from django.db.models import Count, Func
+from datetime import timedelta
+from django.db.models import Count, Func, Q
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -105,12 +104,7 @@ class Unaccent(Func):
     function = 'unaccent'
 
 
-from django.utils import timezone
-from django.db.models import Count, Q
-from datetime import timedelta
-from django.views.generic import ListView
-from applications.alumnos.models import Alumno, Curso, Grupo
-from applications.historial.models import HistorialBathroom
+
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(user_type_required('administrador', 'profesor', 'conserje'), name='dispatch')

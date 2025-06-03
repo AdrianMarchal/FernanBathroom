@@ -1,28 +1,76 @@
 {% extends "base.html" %}
 
 {% block title %}Borrar Todos los Datos{% endblock title %}
+
 {% block header %}
     {% include 'includes/headers/header_admin.html' %}
 {% endblock header %}
-{% block content %}
-<div class="container mt-5">
-    <div class="card border-danger shadow-sm">
-        <div class="card-body">
-            <h2 class="card-title text-danger">⚠️ ¿Estás seguro de que quieres borrar todos los datos?</h2>
-            <p class="card-text">
-                Esta acción <strong>eliminará todos los cursos, grupos y alumnos</strong>. Esta operación no se puede deshacer.
-            </p>
 
-            <form method="post" class="mt-4 d-flex gap-3 align-items-center">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">
-                    🗑 Sí, borrar todo
-                </button>
-                <a href="{% url 'importar_csv' %}" class="btn btn-secondary">
-                    Cancelar
-                </a>
-            </form>
-        </div>
-    </div>
+{% block content %}
+<style>
+  .container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 600px;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2.5rem;
+  }
+
+  h2.card-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+    color: #dc3545; /* bootstrap danger red */
+    margin-bottom: 1rem;
+  }
+
+  p.card-text {
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  form.d-flex {
+    margin-top: 1.5rem;
+  }
+
+  .btn-danger {
+    border-radius: 1.5rem;
+    padding: 0.5rem 1.75rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    transition: background 0.3s ease;
+  }
+  .btn-danger:hover {
+    background-color: #b02a37;
+  }
+
+  .btn-secondary {
+    border-radius: 1.5rem;
+    padding: 0.5rem 1.75rem;
+  }
+</style>
+
+<div class="container">
+  <div class="glass-card">
+    <h2 class="card-title">⚠️ ¿Estás seguro de que quieres borrar todos los datos?</h2>
+    <p class="card-text">
+      Esta acción <strong>eliminará todos los cursos, grupos y alumnos</strong>. Esta operación no se puede deshacer.
+    </p>
+
+    <form method="post" class="d-flex gap-3 align-items-center">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">
+        🗑 Sí, borrar todo
+      </button>
+      <a href="{% url 'importar_csv' %}" class="btn btn-secondary">
+        Cancelar
+      </a>
+    </form>
+  </div>
 </div>
 {% endblock content %}
