@@ -1,6 +1,8 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 import csv
 import io
+import unicodedata
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count, Func, Q
@@ -114,6 +116,12 @@ class ListarAlumnos(ListView):
     context_object_name = 'alumnos'
     paginate_by = 25
 
+    def quitar_tildes(self,texto):
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', texto)
+            if unicodedata.category(c) != 'Mn'
+        )
+
     def get_queryset(self):
         queryset = Alumno.objects.select_related('grupo__curso').order_by(
             'grupo__curso__nivel', 'grupo__letra', 'nombre'
@@ -124,7 +132,7 @@ class ListarAlumnos(ListView):
         grupo_id = self.request.GET.get('grupo')
 
         if nombre:
-            palabras = nombre.strip().split()
+            palabras = self.quitar_tildes(nombre).strip().split()
             queryset = queryset.annotate(nombre_unaccent=Unaccent('nombre'))
             for palabra in palabras:
                 queryset = queryset.filter(nombre_unaccent__icontains=palabra)

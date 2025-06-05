@@ -15,13 +15,18 @@
 
 {% block content %}
     <style>
-        /* Contenedor general */
         .container {
             padding-top: 2rem;
             padding-bottom: 2rem;
         }
 
-        /* Título principal */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
         h2 {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 1.8rem;
@@ -30,7 +35,6 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Glass-card para tabla y formularios */
         .glass-card {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(10px);
@@ -38,9 +42,9 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
             padding: 1.5rem 2rem;
             margin-bottom: 2rem;
+            overflow-x: auto;
         }
 
-        /* Tabla personalizada */
         .table-custom {
             border-radius: 0.75rem;
             overflow: hidden;
@@ -63,7 +67,6 @@
             color: #333333;
         }
 
-        /* Formularios */
         form.row.g-3 > div > input,
         form.row.g-3 > div > select {
             border-radius: 0.75rem;
@@ -78,7 +81,6 @@
             outline: none;
         }
 
-        /* Botones */
         .btn-primary {
             background: #4a90e2;
             border: none;
@@ -98,12 +100,24 @@
             padding: 0.5rem 1.5rem;
         }
 
-        /* Paginación */
+        .pagination-wrapper {
+            overflow-x: auto;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
         .pagination .page-link {
             color: #00703C;
             font-weight: 500;
             border-radius: 0.75rem;
             margin: 0 3px;
+            white-space: nowrap;
+            min-width: 2.5rem;
+            text-align: center;
         }
 
         .pagination .page-item.active .page-link {
@@ -138,14 +152,13 @@
         <h2>Lista de Alumnos</h2>
 
         <div class="glass-card fade-in">
-            <!-- Formulario filtros -->
             <form method="get" class="row g-3 mb-4">
                 <div class="col-md-4">
                     <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre"
                            value="{{ request.GET.nombre }}">
                 </div>
                 <div class="col-md-4">
-                    <select name="curso" class="form-select">
+                    <select name="curso" id="curso" class="form-select">
                         <option value="">Todos los cursos</option>
                         {% for curso in cursos %}
                             <option value="{{ curso.id }}"
@@ -156,7 +169,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <select name="grupo" class="form-select">
+                    <select name="grupo" id="grupo" class="form-select">
                         <option value="">Todos los grupos</option>
                         {% for grupo in grupos %}
                             <option value="{{ grupo.id }}"
@@ -166,90 +179,96 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-12 d-flex gap-3">
-                    <button type="submit" class="btn btn-primary">Buscar</button>
-                    <a href="{% url 'listar_alumnos' %}" class="btn btn-secondary">Limpiar</a>
+                <div class="col-12 d-flex justify-content-between px-2">
+                    <div>
+                        <a href="{% url 'listar_alumnos' %}" class="btn btn-secondary">Limpiar</a>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
                 </div>
             </form>
 
             {% if alumnos %}
                 <table class="table table-hover table-custom mb-0">
                     <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Curso</th>
-                        <th>Grupo</th>
-                        <th>Hoy (Antes del recreo)</th>
-                        <th>Hoy (Después del Recreo)</th>
-                        <th>Total semana</th>
-                        {% if request.user.type_user_per == 'conserje' %}
-                            <th>Acciones</th>
-                        {% endif %}
-                    </tr>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Curso</th>
+                            <th>Grupo</th>
+                            <th>Tramo 1</th>
+                            <th>Tramo 2</th>
+                            <th>Total semana</th>
+                            {% if request.user.type_user_per == 'conserje' %}
+                                <th>Acciones</th>
+                            {% endif %}
+                        </tr>
                     </thead>
                     <tbody>
-                    {% for alumno in alumnos %}
-                        {% with est=estadisticas|get_item:alumno.id %}
-                            <tr>
-                                <td>{{ alumno.nombre }}</td>
-                                <td>{{ alumno.grupo.curso.nivel }}</td>
-                                <td>{{ alumno.grupo.letra }}</td>
-                                <td>{{ est.tramo1|default:0 }}</td>
-                                <td>{{ est.tramo2|default:0 }}</td>
-                                <td>{{ est.semana|default:0 }}</td>
-                                {% if request.user.type_user_per == 'conserje' %}
-                                    <td>
-                                        <form method="post" action="{% url 'crear_historial' alumno.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                ➕ Añadir
-                                            </button>
-                                        </form>
-                                    </td>
-                                {% endif %}
-                            </tr>
-                        {% endwith %}
-                    {% endfor %}
+                        {% for alumno in alumnos %}
+                            {% with est=estadisticas|get_item:alumno.id %}
+                                <tr>
+                                    <td>{{ alumno.nombre }}</td>
+                                    <td>{{ alumno.grupo.curso.nivel }}</td>
+                                    <td>{{ alumno.grupo.letra }}</td>
+                                    <td>{{ est.tramo1|default:0 }}</td>
+                                    <td>{{ est.tramo2|default:0 }}</td>
+                                    <td>{{ est.semana|default:0 }}</td>
+                                    {% if request.user.type_user_per == 'conserje' %}
+                                        <td>
+                                            <form method="post" action="{% url 'crear_historial' alumno.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                    ➕ Añadir
+                                                </button>
+                                            </form>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
                     </tbody>
                 </table>
 
                 {% if is_paginated %}
-                    <nav aria-label="Paginación" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link"
-                                       href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
-                                        Anterior
-                                    </a>
-                                </li>
-                            {% else %}
-                                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-                            {% endif %}
-
-                            {% for num in paginator.page_range %}
-                                {% if num == page_obj.number %}
-                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                                {% else %}
+                    <div class="pagination-wrapper mt-4">
+                        <nav aria-label="Paginación">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
                                     <li class="page-item">
                                         <a class="page-link"
-                                           href="?page={{ num }}&{{ request.GET.urlencode|safe|cut:'page=' }}">{{ num }}</a>
+                                           href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
+                                            Anterior
+                                        </a>
                                     </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">Anterior</span></li>
                                 {% endif %}
-                            {% endfor %}
 
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link"
-                                       href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
-                                        Siguiente
-                                    </a>
-                                </li>
-                            {% else %}
-                                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                                {% for num in paginator.page_range %}
+                                    {% if num == page_obj.number %}
+                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?page={{ num }}&{{ request.GET.urlencode|safe|cut:'page=' }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|safe|cut:'page=' }}">
+                                            Siguiente
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
                 {% endif %}
             {% else %}
                 <div class="alert alert-info">
@@ -258,4 +277,32 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const curso = document.getElementById('curso');
+            const grupo = document.getElementById('grupo');
+
+            curso.addEventListener('change', () => {
+                if (curso.value) {
+                    grupo.value = "";
+                    grupo.disabled = true;
+                } else {
+                    grupo.disabled = false;
+                }
+            });
+
+            grupo.addEventListener('change', () => {
+                if (grupo.value) {
+                    curso.value = "";
+                    curso.disabled = true;
+                } else {
+                    curso.disabled = false;
+                }
+            });
+
+            if (curso.value) grupo.disabled = true;
+            if (grupo.value) curso.disabled = true;
+        });
+    </script>
 {% endblock content %}
