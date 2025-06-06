@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.urls import path, re_path,include
 from django.contrib.auth import views as auth_views
 
+from applications.users.views import LoginView
+
 urlpatterns = [
         path('admin/', admin.site.urls),
+        path('', LoginView.as_view(), name='userLogin'),
         path('', include('applications.users.urls')),
         path('', include('applications.home.urls')),
         path('', include('applications.alumnos.urls')),
