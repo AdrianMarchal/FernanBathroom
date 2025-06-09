@@ -193,41 +193,63 @@
             {% if alumnos %}
                 <table class="table table-hover table-custom mb-0">
                     <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Curso</th>
-                            <th>Grupo</th>
-                            <th>Tramo 1</th>
-                            <th>Tramo 2</th>
-                            <th>Total semana</th>
-                            {% if request.user.type_user_per == 'conserje' %}
-                                <th>Acciones</th>
-                            {% endif %}
-                        </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Curso</th>
+                        <th>Grupo</th>
+                        <th>Tramo 1</th>
+                        <th>Tramo 2</th>
+                        <th>Total semana</th>
+                        {% if request.user.type_user_per == 'profesor' %}
+                            <th>Necesidad médica</th>
+                        {% endif %}
+                        {% if request.user.type_user_per == 'administrador' %}
+                            <th>Editar necesidad médica</th>
+                        {% endif %}
+                        {% if request.user.type_user_per == 'conserje' %}
+                            <th>Acciones</th>
+                        {% endif %}
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for alumno in alumnos %}
-                            {% with est=estadisticas|get_item:alumno.id %}
-                                <tr>
-                                    <td>{{ alumno.nombre }}</td>
-                                    <td>{{ alumno.grupo.curso.nivel }}</td>
-                                    <td>{{ alumno.grupo.letra }}</td>
-                                    <td>{{ est.tramo1|default:0 }}</td>
-                                    <td>{{ est.tramo2|default:0 }}</td>
-                                    <td>{{ est.semana|default:0 }}</td>
-                                    {% if request.user.type_user_per == 'conserje' %}
-                                        <td>
-                                            <form method="post" action="{% url 'crear_historial' alumno.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                    ➕ Añadir
-                                                </button>
-                                            </form>
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                            {% endwith %}
-                        {% endfor %}
+                    {% for alumno in alumnos %}
+                        {% with est=estadisticas|get_item:alumno.id %}
+                            <tr>
+                                <td>{{ alumno.nombre }}</td>
+                                <td>{{ alumno.grupo.curso.nivel }}</td>
+                                <td>{{ alumno.grupo.letra }}</td>
+                                <td>{{ est.tramo1|default:0 }}</td>
+                                <td>{{ est.tramo2|default:0 }}</td>
+                                <td>{{ est.semana|default:0 }}</td>
+
+                                {% if request.user.type_user_per == 'profesor' %}
+                                    <td>{% if alumno.necesidad_medica %}✅{% else %}❌{% endif %}</td>
+                                {% endif %}
+
+                                {% if request.user.type_user_per == 'administrador' %}
+                                    <td>
+                                        <form method="post" action="{% url 'editar_necesidad_medica' alumno.id %}">
+                                            {% csrf_token %}
+                                            <input type="checkbox" name="necesidad_medica" value="true"
+                                                   {% if alumno.necesidad_medica %}checked{% endif %}
+                                                   onchange="this.form.submit();">
+                                        </form>
+                                    </td>
+                                {% endif %}
+
+                                {% if request.user.type_user_per == 'conserje' %}
+                                    <td>
+                                        <form method="post" action="{% url 'crear_historial' alumno.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                ➕ Añadir
+                                            </button>
+                                        </form>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endwith %}
+                    {% endfor %}
                     </tbody>
                 </table>
 
@@ -273,7 +295,7 @@
                 {% endif %}
             {% else %}
                 <div class="alert alert-info">
-                    No hay alumnos registrados aún.
+                    No hay alumnos que cumplan los filtros.
                 </div>
             {% endif %}
         </div>

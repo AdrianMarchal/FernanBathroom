@@ -1,8 +1,7 @@
 # urls.py
 from django.urls import path
 from . import views
-from .views import ListarAlumnos
-
+from .views import ListarAlumnos, EditarNecesidadMedicaView
 
 #URL de la aplicacion
 urlpatterns = [
@@ -13,5 +12,6 @@ urlpatterns = [
     #URL para la vista encargada de listar todos los alumnos
     path('listar_alumnos/', ListarAlumnos.as_view(), name='listar_alumnos'),
 
+    path('editar_necesidad/<int:alumno_id>/', EditarNecesidadMedicaView.as_view(), name='editar_necesidad_medica'),
 
 ]

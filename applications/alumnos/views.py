@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.http import HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.db.models import Func, Count, Q
 from django.views import View
@@ -195,3 +196,13 @@ class ListarAlumnos(ListView):
         context['estadisticas'] = estadisticas
 
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_type_required('administrador'), name='dispatch')
+class EditarNecesidadMedicaView(View):
+    def post(self, request, alumno_id):
+        alumno = get_object_or_404(Alumno, id=alumno_id)
+        alumno.necesidad_medica = 'necesidad_medica' in request.POST
+        alumno.save()
+        return redirect(request.META.get('HTTP_REFERER', 'listar_alumnos'))

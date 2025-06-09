@@ -39,6 +39,7 @@ class Alumno(models.Model):
     nombre = models.CharField(max_length=100)
     #Clave foranea que hace referencia a un grupo
     grupo = models.ForeignKey(Grupo, on_delete=models.CASCADE, related_name='alumnos')
+    necesidad_medica = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('nombre', 'grupo')
