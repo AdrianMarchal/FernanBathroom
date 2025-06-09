@@ -1,1 +1,18 @@
 
+# Ignorar entorno virtual
+.venv/
+.venv1/
+
+# Ignorar archivos pycache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar migrations si quieres (opcional)
+applications/*/migrations/*.pyc
+applications/*/migrations/__pycache__/
+
+# Ignorar archivos de sistema (Windows)
+Thumbs.db
+.DS_Store
