@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from django.db.models import Func
+from django.db.models import Func, Count, Q
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -14,6 +14,7 @@ from datetime import timedelta
 
 
 from .models import Grupo, Alumno, Curso
+from ..historial.models import HistorialBathroom
 from ..users.decorators import user_type_required  # Decorador personalizado para verificar el tipo de usuario
 
 
@@ -141,6 +142,8 @@ class ListarAlumnos(ListView):
         queryset = Alumno.objects.select_related('grupo__curso').order_by(
             'grupo__curso__nivel', 'grupo__letra', 'nombre'
         )
+        print("Alumnos")
+        print(queryset)
 
         # Filtros desde la URL
         nombre = self.request.GET.get('nombre')
@@ -163,12 +166,32 @@ class ListarAlumnos(ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        # Agrega datos adicionales al contexto de la plantilla
         context = super().get_context_data(**kwargs)
 
-        # Cursos y grupos para los filtros
         context['cursos'] = Curso.objects.all().order_by('nivel')
         context['grupos'] = Grupo.objects.select_related('curso').order_by('curso__nivel', 'letra')
 
-        hoy = timezone.localtime().date()  # Fecha actual
-        inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes de esta semana
+        hoy = timezone.localtime().date()
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
+
+        alumno_ids = [a.id for a in context['alumnos']]
+
+        # Obtener los conteos agrupados para todos los alumnos paginados en una consulta
+        registros = HistorialBathroom.objects.filter(
+            alumno_id__in=alumno_ids,
+            fecha__range=(inicio_semana, hoy),
+        ).exclude(tramo=0).values('alumno_id').annotate(
+            tramo1_count=Count('id', filter=Q(tramo=1, fecha=hoy)),
+            tramo2_count=Count('id', filter=Q(tramo=2, fecha=hoy)),
+            semana_count=Count('id'),
+        )
+
+        estadisticas = {r['alumno_id']: {
+            'tramo1': r['tramo1_count'],
+            'tramo2': r['tramo2_count'],
+            'semana': r['semana_count'],
+        } for r in registros}
+
+        context['estadisticas'] = estadisticas
+
+        return context
